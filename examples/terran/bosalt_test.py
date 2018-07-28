@@ -25,7 +25,7 @@ class BoSALT_Test(sc2.BotAI):
                 if len(cc.orders) < 2 and self.can_afford(SCV):
                     await self.do(cc.train(SCV))
                     break
-        elif unit in (SUPPLYDEPOT, BARRACKS, COMMANDCENTER, FACTORY, STARPORT, REFINERY): #building
+        elif unit in (SUPPLYDEPOT, BARRACKS, FACTORY, STARPORT, REFINERY): #building
             if self.can_afford(unit):
                 if unit == REFINERY:
                     for cc in (self.units(ORBITALCOMMAND).ready | self.units(COMMANDCENTER).ready | self.units(ORBITALCOMMAND).ready):
@@ -37,9 +37,28 @@ class BoSALT_Test(sc2.BotAI):
                 else:
                     location = self.start_location.towards(self.game_info.map_center, 8)
                     await self.build(unit, near=location)
+        elif unit == COMMANDCENTER:
+            if self.can_afford(unit):
+                await self.expand_now(unit)
         elif unit == ORBITALCOMMAND:
-            for cc in (self.units(ORBITALCOMMAND).ready):
-                self.combinedActions.append(cc(AbilityId.UPGRADETOORBITAL_ORBITALCOMMAND))
+            for cc in (self.units(COMMANDCENTER).idle):
+                if self.minerals > 150:
+                    await self.do_actions([cc(AbilityId.UPGRADETOORBITAL_ORBITALCOMMAND)])     #(cc(AbilityId.UPGRADETOORBITAL_ORBITALCOMMAND))
+                    break
+        elif unit == BARRACKSREACTOR:
+            for barracks in self.units(BARRACKS).ready:
+                if barracks.add_on_tag == 0:
+                    await self.do(barracks.build(BARRACKSREACTOR))
+        elif unit == BARRACKSTECHLAB:
+            for barracks in self.units(BARRACKS).ready:
+                if barracks.add_on_tag == 0:
+                    await self.do(barracks.build(BARRACKSTECHLAB))
+        elif unit == MARINE:
+            for barracks in self.units(BARRACKS).ready:
+                if self.can_afford(MARINE):
+                    await self.do(barracks.train(MARINE))
+                    break
+
 
 
 
@@ -47,7 +66,7 @@ def main():
     sc2.run_game(sc2.maps.get("Abyssal Reef LE"), [
         Bot(Race.Terran, BoSALT_Test()),
         Computer(Race.Protoss, Difficulty.Easy)
-    ], realtime=False)
+    ], realtime=True)
 
 if __name__ == '__main__':
     main()

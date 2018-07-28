@@ -333,6 +333,8 @@ class BotAI(object):
             amount += sum([o.ability == ability for u in self.units for o in u.orders])
         else:
             amount += sum([o.ability == ability for w in self.workers for o in w.orders])
+            #morphing commandcenter to orbitalcommand still counted as commandcenter
+            amount += sum([o.ability.id == ability.id for w in (self.units.structure) for o in w.orders])
             amount += sum([egg.orders[0].ability == ability for egg in self.units(UnitTypeId.EGG)])
 
         return amount

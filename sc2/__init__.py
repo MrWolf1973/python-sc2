@@ -18,3 +18,4 @@ from . import helpers
 from .data import *
 from .bot_ai import BotAI
 from .main import run_game
+from .bosalt import BoSALT

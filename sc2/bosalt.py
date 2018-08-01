@@ -77,9 +77,19 @@ class BoSALT(object):
         laststep = self.laststep(game_data.supply_used)
         for unittyp in laststep.keys():
             target = int(laststep[unittyp])
-            pending = game_data.already_pending(unittyp)
-            ready = game_data.units(unittyp).amount
-            if target > pending + ready:
+            if type(unittyp) == UpgradeId:
+                pending = 0
+                ready = 0
+            else:
+                ready = game_data.units(unittyp).amount
+                pending = game_data.already_pending(unittyp)
+
+            if unittyp == COMMANDCENTER:
+                morphingout = game_data.already_pending(ORBITALCOMMAND) + game_data.already_pending(PLANETARYFORTRESS)
+            else:
+                morphingout = 0
+
+            if target > (pending + ready - morphingout):
                 return unittyp
 
         if "S" + str(game_data.supply_used) in self.build_order.keys():
@@ -88,9 +98,19 @@ class BoSALT(object):
             actstep = {}
         for unittyp in actstep.keys():
             target = int(actstep[unittyp])
-            pending = game_data.already_pending(unittyp)
-            ready = game_data.units(unittyp).amount
-            if target > pending + ready:
+            if type(unittyp) == UpgradeId:
+                pending = 0
+                ready = 0
+            else:
+                ready = game_data.units(unittyp).amount
+                pending = game_data.already_pending(unittyp)
+
+            if unittyp == COMMANDCENTER:
+                morphingout = game_data.already_pending(ORBITALCOMMAND) + game_data.already_pending(PLANETARYFORTRESS)
+            else:
+                morphingout = 0
+
+            if target > (pending + ready - morphingout):
                 return unittyp
 
 
